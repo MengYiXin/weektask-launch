@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>周报神器 · Weekly Reporter Pro</title>
+  <meta name="description" content="AI 加持的周报日报生成器，3 分钟出一份领导想看的周报。">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-card: #111111;
+      --bg-card-hover: #161616;
+      --border: #1f1f1f;
+      --text: #e0e0e0;
+      --text-dim: #888888;
+      --text-dimmer: #666666;
+      --accent: #22c55e;
+      --accent-dim: #16a34a;
+      --warning: #f59e0b;
+      --error: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 16px;
+    }
+    .container { max-width: 980px; margin: 0 auto; padding: 24px; }
+
+    /* HERO */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--text-dim);
+      max-width: 640px;
+      margin: 0 auto 36px;
+    }
+    .cta {
+      display: inline-flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn {
+      display: inline-block;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+      color: white;
+      box-shadow: 0 4px 20px rgba(34, 197, 94, 0.25);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(34, 197, 94, 0.4); }
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--bg-card-hover); }
+
+    /* SECTIONS */
+    section { padding: 60px 0; border-bottom: 1px solid var(--border); }
+    section h2 {
+      font-size: 32px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    section .subtitle {
+      text-align: center;
+      color: var(--text-dim);
+      margin-bottom: 48px;
+    }
+
+    /* PAIN POINTS */
+    .pain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .pain-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .pain-card .icon { font-size: 28px; margin-bottom: 12px; }
+    .pain-card h3 { font-size: 17px; margin-bottom: 8px; }
+    .pain-card p { color: var(--text-dim); font-size: 14px; }
+
+    /* FEATURES */
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .feature {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: all 0.2s;
+    }
+    .feature:hover { background: var(--bg-card-hover); border-color: var(--accent); transform: translateY(-2px); }
+    .feature .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--accent);
+      border-radius: 6px;
+      font-size: 11px;
+      margin-bottom: 12px;
+    }
+    .feature h3 { font-size: 19px; margin-bottom: 10px; }
+    .feature p { color: var(--text-dim); font-size: 14px; }
+
+    /* DEMO MOCKUP */
+    .demo {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0;
+      overflow: hidden;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .demo-bar {
+      background: #1a1a1a;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .demo-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--text-dimmer); }
+    .demo-dot.r { background: #ef4444; }
+    .demo-dot.y { background: #f59e0b; }
+    .demo-dot.g { background: #22c55e; }
+    .demo-body { padding: 28px; font-family: 'SF Mono', Consolas, monospace; font-size: 13px; line-height: 1.7; }
+    .demo-body .line { margin-bottom: 6px; }
+    .demo-body .label { color: var(--text-dimmer); }
+    .demo-body .ok { color: var(--accent); }
+    .demo-body .warn { color: var(--warning); }
+    .demo-body .err { color: var(--error); }
+
+    /* PRICING */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; max-width: 720px; margin: 0 auto; }
+    .price-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      position: relative;
+    }
+    .price-card.featured { border-color: var(--accent); box-shadow: 0 0 30px rgba(34, 197, 94, 0.15); }
+    .price-card .tag-pop {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 12px;
+      background: var(--accent);
+      color: white;
+      font-size: 11px;
+      border-radius: 100px;
+    }
+    .price-card h3 { font-size: 20px; margin-bottom: 8px; }
+    .price-card .price { font-size: 36px; font-weight: 700; margin: 16px 0; }
+    .price-card .price small { font-size: 14px; color: var(--text-dimmer); font-weight: 400; }
+    .price-card ul { list-style: none; text-align: left; margin: 20px 0; }
+    .price-card li { padding: 6px 0; color: var(--text-dim); font-size: 14px; }
+    .price-card li::before { content: '✓ '; color: var(--accent); }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      text-align: center;
+      color: var(--text-dimmer);
+      font-size: 13px;
+    }
+    footer a { color: var(--text-dim); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 32px; }
+      .hero p { font-size: 16px; }
+      section h2 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- HERO -->
+    <section class="hero" style="border-bottom: none; padding-bottom: 0;">
+      <span class="badge">🚀 AI 周报工具 · 上线即用</span>
+      <h1>3 分钟出领导想看的周报</h1>
+      <p>AI 加持的周报日报生成器，30 秒填工作内容，3 分钟出 Excel 0601 规范版本。IT/售前/技术从业者专用。</p>
+      <div class="cta">
+        <a href="#pricing" class="btn btn-primary">立即试用</a>
+        <a href="#features" class="btn btn-secondary">看看功能</a>
+      </div>
+    </section>
+
+    <!-- PAIN POINTS -->
+    <section>
+      <h2>你是否这样写周报？</h2>
+      <p class="subtitle">这些痛点，我们都遇到过</p>
+      <div class="pain-grid">
+        <div class="pain-card">
+          <div class="icon">😩</div>
+          <h3>周五下午凑字数</h3>
+          <p>周报拖到周五晚上，对着空白文档发呆 2 小时</p>
+        </div>
+        <div class="pain-card">
+          <div class="icon">📋</div>
+          <h3>格式不对被打回</h3>
+          <p>领导说"段一 E 列必须是红色"，第二周又被打回</p>
+        </div>
+        <div class="pain-card">
+          <div class="icon">🤦</div>
+          <h3>配置出错返工</h3>
+          <p>B2 机型 40 核配了 32 根内存，插不上才发现</p>
+        </div>
+        <div class="pain-card">
+          <div class="icon">🔄</div>
+          <h3>换电脑数据没了</h3>
+          <p>本地保存数据，换设备就要重写</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features">
+      <h2>周报神器的解法</h2>
+      <p class="subtitle">4 个核心能力，一次解决</p>
+      <div class="feature-grid">
+        <div class="feature">
+          <span class="tag">M 模式</span>
+          <h3>📝 AI 一键整理</h3>
+          <p>每天 30 秒记工作内容，AI 自动整理成日报/周报。无需基础配置。</p>
+        </div>
+        <div class="feature">
+          <span class="tag">Y 模式</span>
+          <h3>🏢 国企标准格式</h3>
+          <p>严格按 0601-0605 原版 Excel 格式输出：4 段结构、列宽 6/28/65/31.27/53.18/28、E 列红色、合并单元格全保留。</p>
+        </div>
+        <div class="feature">
+          <span class="tag">校验器</span>
+          <h3>🔍 10 条配置规则自检</h3>
+          <p>B2 内存槽位特例、CPU 路数-机型匹配、GPU-卡多多绑定、电源功率等，一键导入 Excel 报价表自动校验。</p>
+        </div>
+        <div class="feature">
+          <span class="tag">同步</span>
+          <h3>☁️ GitHub Gist 多设备同步</h3>
+          <p>用你自己的 Gist 同步数据，无需注册、无需后端、跨设备免费用。</p>
+        </div>
+        <div class="feature">
+          <span class="tag">隐私</span>
+          <h3>🔒 本地优先</h3>
+          <p>所有数据保存在浏览器本地，API Key 不经过任何中间服务器，隐私零风险。</p>
+        </div>
+        <div class="feature">
+          <span class="tag">导出</span>
+          <h3>📊 一键 Excel 导出</h3>
+          <p>导出后直接发给领导，格式严格按 0601-0605 原版规范，红色 E 列、合并单元格全在。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEMO -->
+    <section>
+      <h2>看一眼校验器效果</h2>
+      <p class="subtitle">导入报价表 → 一键检查 → Markdown 报告</p>
+      <div class="demo">
+        <div class="demo-bar">
+          <span class="demo-dot r"></span>
+          <span class="demo-dot y"></span>
+          <span class="demo-dot g"></span>
+        </div>
+        <div class="demo-body">
+          <div class="line"><span class="label"># 华鲲配置一致性检测报告</span></div>
+          <div class="line"><span class="label">检测时间：</span>2026-10-12 14:23</div>
+          <div class="line"><span class="label">机型：</span>AT9508 G3（卡多多）</div>
+          <div class="line">&nbsp;</div>
+          <div class="line"><span class="label">## 客户需求</span></div>
+          <div class="line">- CPU：48 核</div>
+          <div class="line">- 内存：512 GB</div>
+          <div class="line">- 数据盘：12 TB</div>
+          <div class="line">- GPU：Atlas 300I Duo × 6 张</div>
+          <div class="line">&nbsp;</div>
+          <div class="line"><span class="label">## 检测结果：</span><span class="warn">需沟通正偏离</span></div>
+          <div class="line">&nbsp;</div>
+          <div class="line"><span class="err">❌ 错误 (1)</span></div>
+          <div class="line">- <span class="err">CPU路数-机型匹配</span>：4路CPU必须选TG245 B1或AT3500 G3</div>
+          <div class="line">  - 建议：选择 AT3500 G3 4U 4路机型</div>
+          <div class="line">&nbsp;</div>
+          <div class="line"><span class="warn">⚠ 正偏离需沟通 (2)</span></div>
+          <div class="line">- <span class="warn">内存槽位</span>：B2机型 48核 ≥ 32槽 ✓</div>
+          <div class="line">- <span class="warn">GPU 数量</span>：5张及以上 DUO 必须 AT9508 G3 ✓</div>
+          <div class="line">&nbsp;</div>
+          <div class="line"><span class="ok">✅ 满足 (7)</span></div>
+          <div class="line">- <span class="ok">电源功率</span>、<span class="ok">机箱外形</span>、<span class="ok">NVMe需求</span> 等</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing">
+      <h2>简单定价，立即开始</h2>
+      <p class="subtitle">免费版完全可用，Pro 版解锁内容能力</p>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <h3>免费版</h3>
+          <div class="price">¥0<small>/永久</small></div>
+          <ul>
+            <li>AI 周报生成</li>
+            <li>基础配置校验</li>
+            <li>本地保存</li>
+            <li>Claude API 自带</li>
+          </ul>
+          <a href="#" class="btn btn-secondary" style="width:100%;">立即开始</a>
+        </div>
+        <div class="price-card featured">
+          <span class="tag-pop">最受欢迎</span>
+          <h3>Pro 版</h3>
+          <div class="price">¥299<small>/年</small></div>
+          <ul>
+            <li>免费版所有功能</li>
+            <li>AI 工作内容优化</li>
+            <li>Excel 0601 严格导出</li>
+            <li>GitHub Gist 同步</li>
+            <li>邮件提醒</li>
+            <li>优先客服支持</li>
+          </ul>
+          <a href="#" class="btn btn-primary" style="width:100%;">升级 Pro</a>
+        </div>
+      </div>
+      <p style="text-align:center;color:var(--text-dimmer);margin-top:24px;font-size:13px;">
+        学生 / 教师 / 公益项目可申请 50% 折扣 — 邮件联系 mengyx@example.com
+      </p>
+    </section>
+
+    <!-- CTA -->
+    <section style="border-bottom: none; text-align: center; padding: 60px 0;">
+      <h2>现在就开始，写更好的周报</h2>
+      <p class="subtitle">3 分钟设置，每天省 30 分钟</p>
+      <div class="cta">
+        <a href="#" class="btn btn-primary">立即试用</a>
+        <a href="#" class="btn btn-secondary">查看 GitHub</a>
+      </div>
+    </section>
+
+    <footer>
+      <p>© 2026 周报神器 · Powered by MengYiXin · <a href="#">隐私</a> · <a href="#">条款</a> · <a href="#">联系</a></p>
+    </footer>
+  </div>
+</body>
+</html>
